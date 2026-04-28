@@ -4,7 +4,7 @@
 
 这是一个课程作业项目。它要解决的问题是：给定一段中文 AI 初稿，自动检测其中的 AI 写作痕迹，自动改写高风险部分，再复测并生成修改前后的对比报告。
 
-项目不把“降 AI 率”做成简单的同义词替换，而是拆成两个独立模块：
+项目把“降 AI 率”拆成两个独立模块，避免只做同义词替换：
 
 - A：检测器，给文本计算一个可复现的 `AI-like Rate`。
 - B：改写器，根据检测结果、来源材料和作者补充信息生成修改稿。
@@ -58,7 +58,7 @@ stop: target reached
 
 ## 方法设计
 
-本项目把所谓“AI 率”定义成项目内的可复现实验指标，而不是权威鉴定结论。
+本项目把所谓“AI 率”定义成项目内的可复现实验指标，用来比较同一套流程下的修改前后变化。
 
 本地检测器主要看六类信号：
 
@@ -113,7 +113,7 @@ $$
 
 ## 分步运行
 
-如果不想直接运行完整 pipeline，可以按步骤执行：
+也可以按步骤执行：
 
 ```bash
 python scripts/ai_rate.py examples/original.md
@@ -145,7 +145,7 @@ python scripts/adversarial_loop.py \
   --report examples/report.md
 ```
 
-如果设置了 `SAPLING_API_KEY`，`scripts/ai_rate.py` 可以优先调用 Sapling AI Detector API；没有 key 时会自动使用本地规则评分。
+设置 `SAPLING_API_KEY` 后，`scripts/ai_rate.py` 可以优先调用 Sapling AI Detector API；未设置 key 时会自动使用本地规则评分。
 
 ## 示例文件
 
@@ -238,11 +238,11 @@ auto-de-ai-writing-skill/
 
 ## 限制
 
-本项目的 `AI-like Rate` 是项目内实验指标，不是学校或商业平台的权威检测结论。第三方检测器本身也只能给概率参考，不能证明文本一定由 AI 或人类撰写。
+本项目的 `AI-like Rate` 是项目内实验指标，用于展示同一套规则下的修改效果。学校或商业平台的检测结果属于另一套指标体系，第三方检测器也只提供概率参考；作者身份需要结合来源材料、写作过程和人工判断。
 
-本地 `auto_rewrite.py` 是为了让作业能离线复现的 baseline，不等于最终高质量人工稿。正式提交文本时，仍建议结合 `examples/rewrite_prompt.md` 做人工检查和二次精修。
+本地 `auto_rewrite.py` 是为了让作业能离线复现的 baseline。正式提交文本时，建议结合 `examples/rewrite_prompt.md` 做人工检查和二次精修。
 
-本项目不承诺通过任何第三方 AI 检测器，也不会编造来源、经历、引用或 API 结果。
+所有改写都以用户提供的材料为边界。来源、经历、引用和 API 结果需要可核验依据。
 
 ## License
 
