@@ -47,6 +47,8 @@ def main() -> None:
             "examples/author_notes.md",
             "--source",
             "examples/source_brief.md",
+            "--generated-at",
+            "2026-04-28 00:00:00",
             "--out",
             "examples/report.md",
         ],

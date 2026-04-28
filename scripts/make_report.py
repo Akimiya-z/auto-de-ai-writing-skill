@@ -118,6 +118,7 @@ def build_report(
     revised_result: dict[str, Any],
     notes_path: Path | None = None,
     source_path: Path | None = None,
+    generated_at: str | None = None,
 ) -> str:
     before = float(original_result["ai_rate"])
     after = float(revised_result["ai_rate"])
@@ -132,7 +133,7 @@ def build_report(
     lines = [
         "# AI 率前后对比报告",
         "",
-        f"生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+        f"生成时间：{generated_at or datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
         "",
         "## 结论",
         "",
@@ -245,6 +246,10 @@ def main() -> None:
     parser.add_argument("--notes", help="Optional author notes file.")
     parser.add_argument("--source", help="Optional source brief file.")
     parser.add_argument(
+        "--generated-at",
+        help="Optional report timestamp. Useful for reproducible examples.",
+    )
+    parser.add_argument(
         "--provider",
         choices=["auto", "sapling", "local"],
         default="auto",
@@ -266,6 +271,7 @@ def main() -> None:
         revised_result,
         notes_path=notes_path,
         source_path=source_path,
+        generated_at=args.generated_at,
     )
 
     if args.out:
