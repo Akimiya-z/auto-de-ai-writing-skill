@@ -56,7 +56,7 @@ def build_prompt(draft: str, notes: str, source: str, voice_sample: str) -> str:
     analysis = analyze_text(draft)
     return f"""# 改写任务
 
-请把下面的 AI 初稿改成一篇更像真实作者写出的中文项目说明。目标不是编造经历，也不是故意制造病句，而是加入真实来源、作者补充材料、项目实现细节和个人取舍，让文本更具体、更可解释。
+请把下面的 AI 初稿改成一篇更像真实作者写出的中文项目说明。改写时加入真实来源、作者补充材料、项目实现细节和个人取舍；经历、引用和检测结果必须有依据。
 
 ## 当前检测结果
 

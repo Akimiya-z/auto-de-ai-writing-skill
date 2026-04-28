@@ -1,6 +1,6 @@
 # 改写任务
 
-请把下面的 AI 初稿改成一篇更像真实作者写出的中文项目说明。目标不是编造经历，也不是故意制造病句，而是加入真实来源、作者补充材料、项目实现细节和个人取舍，让文本更具体、更可解释。
+请把下面的 AI 初稿改成一篇更像真实作者写出的中文项目说明。改写时加入真实来源、作者补充材料、项目实现细节和个人取舍；经历、引用和检测结果必须有依据。
 
 ## 当前检测结果
 
@@ -40,6 +40,7 @@ Build a reusable skill-style workflow that can take an AI-generated Chinese draf
 - Calculate a reproducible AI-like rate without requiring a local large model.
 - Generate a structured rewrite prompt based on source material, author notes, and voice sample.
 - Run a detector-rewriter loop until the local AI-like rate reaches a target threshold or stops improving.
+- Add an independent review gate so the demo does not only optimize the local detector score.
 - Produce a Markdown report with before/after score, reduction formula, pattern hits, high-risk sentences, and limitations.
 - Keep optional third-party API support, but make the default path runnable with only Python standard library.
 
@@ -57,9 +58,10 @@ $$
 
 - 来源文件：`examples/source_brief.md`，用于定义示例项目需求。
 - AI 初稿：`examples/original.md`，根据 source brief 生成，保留典型 AI 口吻用于测试。
-- 修改稿：`examples/revised.md`，由 `adversarial_loop.py` 自动生成，用来展示 A/B/A 闭环效果。
-- 项目定位：做一个 `auto-de-ai-writing-skill`，不是只替换同义词，而是检测 AI 味、补充真实材料、自动改写、复测并输出报告。
-- 技术实现：Python 脚本包括 `ai_rate.py`、`analyze_text.py`、`rewrite_prompt.py`、`auto_rewrite.py`、`adversarial_loop.py`、`voice_profile.py` 和 `make_report.py`。
+- 修改稿：`examples/revised.md`，由 `adversarial_loop.py` 自动生成，用来展示 A/B/C 闭环效果。
+- 项目定位：做一个 `auto-de-ai-writing-skill`，流程包含 AI 味检测、真实材料补充、自动改写、复测和报告输出。
+- 技术实现：Python 脚本包括 `ai_rate.py`、`analyze_text.py`、`rewrite_prompt.py`、`auto_rewrite.py`、`review_text.py`、`adversarial_loop.py`、`voice_profile.py` 和 `make_report.py`。
+- 独立审查：`review_text.py` 检查来源材料覆盖、文本质量、局限说明和指标投机，专门拦截堆文件名或堆数字的改写稿。
 - 复现约束：不默认运行本地大模型，因为安装 `torch`、下载模型和处理硬件差异会提高门槛。
 - 自动化要求：不依赖手动网页截图；优先支持 Sapling API；没有 API key 时使用本地规则评分。
 - 关键判断：检测器分数不能证明文本作者，但可以作为项目内的实验指标。

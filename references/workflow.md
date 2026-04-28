@@ -1,4 +1,4 @@
-# 检测-改写-复测工作流
+# 检测-改写-复测-审查工作流
 
 ## 1. 建立基线
 
@@ -50,7 +50,7 @@ python scripts/rewrite_prompt.py original.md --notes author_notes.md --source so
 python scripts/auto_rewrite.py original.md --notes author_notes.md --source source_brief.md --voice voice_sample.md --out revised.md
 ```
 
-完整 A/B 闭环：
+完整 A/B/C 闭环：
 
 ```bash
 python scripts/adversarial_loop.py --original original.md --notes author_notes.md --source source_brief.md --voice voice_sample.md --target-rate 25 --max-rounds 5 --out revised.md --report report.md
@@ -65,12 +65,13 @@ python scripts/adversarial_loop.py --original original.md --notes author_notes.m
 5. 保留事实含义。
 6. 写出修改依据。
 
-## 5. 复测和迭代
+## 5. 复测、审查和迭代
 
-再次运行：
+再次运行检测器和独立审查器：
 
 ```bash
 python scripts/ai_rate.py revised.md
+python scripts/review_text.py --original original.md --revised revised.md --notes author_notes.md --source source_brief.md
 ```
 
 如果 AI 率仍高，优先检查：
@@ -80,11 +81,20 @@ python scripts/ai_rate.py revised.md
 - 是否连接词过密。
 - 是否长句没有数据或例子。
 
+如果审查器未通过，优先检查：
+
+- 是否为了降分堆叠文件名、数字或来源短语。
+- 是否缺少“检测分数只是实验指标”的局限说明。
+- 是否承诺“通过所有检测器”或出现“绕过检测”等表达。
+- 是否和原文主题差异过大，产生事实漂移。
+
 循环停止条件：
 
 $$
-S_t \leq \tau
+S_t \leq \tau \land R_t \geq \rho \land B_t=0
 $$
+
+其中 \(S_t\) 是 AI-like Rate，\(R_t\) 是独立审查分，\(\rho\) 是审查阈值，\(B_t\) 是阻断项数量。
 
 或：
 
@@ -106,6 +116,7 @@ python scripts/make_report.py original.md revised.md --out report.md
 - 修改后 AI 率。
 - 降幅公式。
 - AI 味特征变化。
+- 独立审查分、证据覆盖和阻断项。
 - 高风险句子列表。
 - 对抗式迭代记录。
 - 修改说明和限制说明。

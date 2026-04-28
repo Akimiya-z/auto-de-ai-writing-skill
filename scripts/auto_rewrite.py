@@ -45,6 +45,8 @@ REPLACEMENTS = [
     (r"充分体现文本优化效果", "在报告中展示修改效果"),
     (r"内容结构更加合理", "段落围绕来源、实现和限制展开"),
     (r"增强项目的规范性和完整性", "保留可复现的输入、输出和限制说明"),
+    (r"并不是简单的文字替换，而是需要综合考虑", "需要同时检查"),
+    (r"不是简单的文字替换，而是需要综合考虑", "需要同时检查"),
 ]
 
 LEADING_CONNECTOR_RE = re.compile(
@@ -90,7 +92,29 @@ def material_lines(text: str, limit: int = 8) -> list[str]:
     return lines
 
 
+def material_terms(text: str, limit: int = 8) -> list[str]:
+    terms: list[str] = []
+    patterns = [
+        r"`([^`]{2,60})`",
+        r"\b[\w.-]+\.(?:py|md|yaml|yml|json|txt|csv|xlsx)\b",
+        r"\b[A-Za-z][A-Za-z0-9_-]{3,}\b",
+    ]
+    for pattern in patterns:
+        for match in re.finditer(pattern, text):
+            value = match.group(1) if match.groups() else match.group(0)
+            value = value.strip("` ，。；;:：")
+            if 2 <= len(value) <= 60 and value.lower() not in {"source", "brief"}:
+                if value not in terms:
+                    terms.append(value)
+            if len(terms) >= limit:
+                return terms
+    return terms
+
+
 def short_material(source: str, notes: str, limit: int = 90) -> str:
+    terms = material_terms(notes + "\n" + source, 3)
+    if terms:
+        return "、".join(f"`{term}`" for term in terms)
     candidates = material_lines(notes, 4) + material_lines(source, 4)
     if not candidates:
         return "用户提供的来源材料和作者补充信息"
@@ -108,7 +132,7 @@ def mostly_ascii(text: str) -> bool:
 
 def display_line(line: str) -> str:
     if mostly_ascii(line):
-        return "source brief 中对示例场景和发布约束的说明"
+        return "source brief 中的项目需求说明"
     return line
 
 
@@ -136,14 +160,6 @@ def normalize_sentence(sentence: str) -> str:
 
 def rewrite_sentence(sentence: str, material_hint: str, pronoun: str, round_index: int) -> str:
     rewritten = normalize_sentence(sentence)
-    risks = sentence_risks([sentence])
-    risk_score = risks[0].score if risks else 0.0
-
-    if risk_score >= 45 and not has_detail_or_author(rewritten):
-        if round_index <= 1:
-            rewritten = f"{rewritten.rstrip('。')}，这里依据{material_hint}来限定范围。"
-        else:
-            rewritten = f"{pronoun}把这一句改成可检查的表述：{rewritten.rstrip('。')}。依据是{material_hint}。"
     return rewritten
 
 
@@ -159,17 +175,19 @@ def rewrite_paragraph(paragraph: str, material_hint: str, pronoun: str, round_in
 
 
 def context_paragraph(source: str, notes: str, voice: str) -> str:
-    source_items = material_lines(source, 2)
-    note_items = material_lines(notes, 3)
+    terms = material_terms(notes + "\n" + source, 6)
     pronoun = choose_pronoun(notes, voice)
-    if not source_items and not note_items:
+    if not terms and not source.strip() and not notes.strip():
         return ""
 
-    source_part = display_line(source_items[0]) if source_items else "用户提供的原始任务材料"
-    note_part = "；".join(display_line(item) for item in note_items[:2]) if note_items else "作者补充材料"
+    if terms:
+        term_text = "、".join(f"`{term}`" for term in terms[:5])
+    else:
+        source_items = material_lines(source, 1)
+        term_text = display_line(source_items[0]) if source_items else "作者补充材料"
     return (
-        f"本次修改先固定材料来源：{source_part}。"
-        f"{pronoun}使用「{note_part}」作为改写依据，避免把空泛判断改成没有来源的新说法。"
+        f"本次改写先固定材料边界：{pronoun}只使用{term_text}和来源说明中的项目需求。"
+        "没有依据的经历、引用和第三方检测结果不写入正文。"
     )
 
 

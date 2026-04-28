@@ -1,7 +1,7 @@
 interface:
   display_name: "Auto De-AI Writing"
-  short_description: "自动检测并降低中文文本中的 AI 味"
-  default_prompt: "Use $auto-de-ai-writing-skill to revise an AI draft with author notes and generate an AI-rate comparison report."
+  short_description: "用检测、改写和独立审查降低中文文本的 AI 味"
+  default_prompt: "Use $auto-de-ai-writing-skill to revise an AI draft with author notes, run the review gate, and generate an AI-like rate comparison report."
 
 policy:
   allow_implicit_invocation: true

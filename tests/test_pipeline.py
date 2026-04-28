@@ -11,6 +11,7 @@ sys.path.insert(0, str(SCRIPTS))
 
 from adversarial_loop import run_loop  # noqa: E402
 from analyze_text import analyze_text  # noqa: E402
+from review_text import review_candidate  # noqa: E402
 from rewrite_prompt import build_prompt  # noqa: E402
 
 
@@ -38,7 +39,7 @@ class PipelineTests(unittest.TestCase):
         self.assertNotIn("保留主题：通过 GitHub 项目或 skill 自动降低文本的 AI-like 率", prompt)
 
     def test_adversarial_loop_reaches_demo_target(self) -> None:
-        revised_text, revised_result, iterations, stop_reason = run_loop(
+        revised_text, revised_result, final_review, iterations, stop_reason = run_loop(
             original_path=ROOT / "examples/original.md",
             notes_path=ROOT / "examples/author_notes.md",
             source_path=ROOT / "examples/source_brief.md",
@@ -46,14 +47,28 @@ class PipelineTests(unittest.TestCase):
             target_rate=25.0,
             max_rounds=5,
             min_delta=1.0,
+            min_review_score=70.0,
             provider="local",
         )
 
         self.assertLessEqual(float(revised_result["ai_rate"]), 25.0)
-        self.assertEqual(stop_reason, "target reached")
+        self.assertEqual(stop_reason, "target and review reached")
+        self.assertTrue(final_review["pass"])
         self.assertTrue(iterations)
         self.assertTrue(iterations[-1].accepted)
         self.assertIn("检测分数只作为项目内的实验指标", revised_text)
+
+    def test_review_gate_rejects_detector_evasion_claims(self) -> None:
+        result = review_candidate(
+            original="这是一个课程作业项目。",
+            revised="本项目保证通过所有检测器，并且可以绕过检测。没有其他限制。",
+            notes="作者补充：项目只展示本地实验指标。",
+            source="任务：生成可复现报告。",
+            min_score=70.0,
+        )
+
+        self.assertFalse(result["pass"])
+        self.assertTrue(result["blockers"])
 
 
 if __name__ == "__main__":
