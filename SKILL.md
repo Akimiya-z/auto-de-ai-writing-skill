@@ -12,7 +12,7 @@ Use this skill to turn an AI-generated Chinese draft into a more specific, sourc
 ## Core Workflow
 
 1. Collect the draft, source context, target audience, and any required word count or format.
-2. Ask for or locate author notes before rewriting: personal experience, class materials, data, examples, opinions, citations, or constraints.
+2. Ask for or locate author notes before rewriting: personal experience, source materials, data, examples, opinions, citations, or constraints.
 3. Run `scripts/ai_rate.py` on the original text to get an AI-rate baseline.
 4. Run `scripts/analyze_text.py` to identify high-risk AI-flavored sentences and pattern categories.
 5. Build a voice profile with `scripts/voice_profile.py` when a sample is available.
@@ -81,7 +81,7 @@ Do not claim that the score is a universal or institutionally valid AI detector.
 
 ## Rewriting Rules
 
-- Keep factual meaning stable; do not invent data, citations, class events, or personal experiences.
+- Keep factual meaning stable; do not invent data, citations, source events, or personal experiences.
 - Replace generic claims with user-provided or source-backed details.
 - Calibrate against the user's voice sample when available; preserve first-person project decisions and concrete file names.
 - Prefer uneven but readable sentence rhythm over mechanical three-part paragraphs.
