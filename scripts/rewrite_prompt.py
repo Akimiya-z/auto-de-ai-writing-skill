@@ -84,9 +84,9 @@ def build_prompt(draft: str, notes: str, source: str, voice_sample: str) -> str:
 
 ## 改写要求
 
-1. 保留主题：通过 GitHub 项目或 skill 自动降低文本的 AI-like 率。
-2. 明确说明文本来源来自 source brief。
-3. 加入项目文件、脚本名、命令、指标和实现取舍。
+1. 保留原文主题和任务要求；如果 source brief 中有主题，以 source brief 为准。
+2. 明确说明文本来源来自 source brief 或用户提供的材料。
+3. 加入可核验的材料，例如项目文件、脚本名、命令、指标、案例、数据或实现取舍。
 4. 删除空泛套话，例如“随着技术发展”“具有重要意义”“综上所述”。
 5. 不要编造 API 结果；没有 API key 时只写本地 AI-like Rate。
 6. 结尾必须说明检测分数只是实验指标，不是作者身份证明。

@@ -1,4 +1,4 @@
-# 降 AI 率工作流
+# 检测-改写-复测工作流
 
 ## 1. 建立基线
 
@@ -42,9 +42,21 @@ python scripts/rewrite_prompt.py original.md --notes author_notes.md --source so
 - voice profile。
 - 不得编造事实的约束。
 
-## 4. 分段改写
+## 4. 自动改写或分段精修
 
-按段处理，不要整篇一次性洗稿：
+本地自动 baseline：
+
+```bash
+python scripts/auto_rewrite.py original.md --notes author_notes.md --source source_brief.md --voice voice_sample.md --out revised.md
+```
+
+完整 A/B 闭环：
+
+```bash
+python scripts/adversarial_loop.py --original original.md --notes author_notes.md --source source_brief.md --voice voice_sample.md --target-rate 25 --max-rounds 5 --out revised.md --report report.md
+```
+
+如果由 skill agent 直接改写，仍然按段处理，不要整篇一次性洗稿：
 
 1. 找到段落主张。
 2. 删除空泛铺垫。
@@ -68,6 +80,18 @@ python scripts/ai_rate.py revised.md
 - 是否连接词过密。
 - 是否长句没有数据或例子。
 
+循环停止条件：
+
+$$
+S_t \leq \tau
+$$
+
+或：
+
+$$
+\Delta_t=S_{t-1}-S_t<\epsilon
+$$
+
 ## 6. 输出报告
 
 运行：
@@ -83,4 +107,5 @@ python scripts/make_report.py original.md revised.md --out report.md
 - 降幅公式。
 - AI 味特征变化。
 - 高风险句子列表。
+- 对抗式迭代记录。
 - 修改说明和限制说明。

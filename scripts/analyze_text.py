@@ -241,20 +241,19 @@ def catalog_hits(text: str) -> list[dict[str, Any]]:
         patterns = item["patterns"]
         matches: list[str] = []
         for pattern in patterns:
-            matches.extend(re.findall(pattern, text, flags=re.IGNORECASE))
+            matches.extend(
+                match.group(0)
+                for match in re.finditer(pattern, text, flags=re.IGNORECASE)
+            )
         if matches:
-            normalized = [
-                "".join(match) if isinstance(match, tuple) else str(match)
-                for match in matches
-            ]
             hits.append(
                 {
                     "id": item["id"],
                     "category": item["category"],
                     "label": item["label"],
-                    "count": len(normalized),
+                    "count": len(matches),
                     "weight": item["weight"],
-                    "examples": normalized[:5],
+                    "examples": matches[:5],
                     "advice": item["advice"],
                 }
             )

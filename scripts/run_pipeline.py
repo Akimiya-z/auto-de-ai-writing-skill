@@ -10,13 +10,15 @@ from pathlib import Path
 
 
 def run(cmd: list[str], cwd: Path) -> None:
-    print("$ " + " ".join(cmd))
+    print("$ " + " ".join(cmd), flush=True)
     subprocess.run(cmd, cwd=cwd, check=True)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run demo prompt generation and report generation.")
+    parser = argparse.ArgumentParser(description="Run demo prompt generation and adversarial loop report generation.")
     parser.add_argument("--base", default=".", help="Project root.")
+    parser.add_argument("--target-rate", type=float, default=25.0, help="Demo target AI-like rate.")
+    parser.add_argument("--max-rounds", type=int, default=5, help="Maximum rewrite rounds.")
     args = parser.parse_args()
     base = Path(args.base).resolve()
     py = sys.executable
@@ -40,17 +42,27 @@ def main() -> None:
     run(
         [
             py,
-            "scripts/make_report.py",
+            "scripts/adversarial_loop.py",
+            "--original",
             "examples/original.md",
-            "examples/revised.md",
             "--notes",
             "examples/author_notes.md",
             "--source",
             "examples/source_brief.md",
+            "--voice",
+            "examples/voice_sample.md",
+            "--target-rate",
+            str(args.target_rate),
+            "--max-rounds",
+            str(args.max_rounds),
+            "--provider",
+            "local",
+            "--out",
+            "examples/revised.md",
+            "--report",
+            "examples/report.md",
             "--generated-at",
             "2026-04-28 00:00:00",
-            "--out",
-            "examples/report.md",
         ],
         base,
     )
