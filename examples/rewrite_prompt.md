@@ -46,9 +46,9 @@ Build a reusable skill-style workflow that can take an AI-generated Chinese draf
 
 The demo should show a measurable reduction from the original draft to the revised text:
 
-\[
+$$
 reduction=\frac{before-after}{before}\times100\%
-\]
+$$
 
 ## 作者补充材料
 

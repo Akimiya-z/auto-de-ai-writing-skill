@@ -61,21 +61,21 @@ If `SAPLING_API_KEY` is set, `scripts/ai_rate.py` tries Sapling first. If the AP
 
 Use one normalized output field for every detector:
 
-\[
-AI率 = score \times 100\%
-\]
+$$
+\text{AI Rate} = score \times 100\%
+$$
 
 For the local fallback, calculate:
 
-\[
+$$
 AI\text{-}like\ Rate = f(模板表达, 空泛词, 重复连接词, 句式单一度, 具体细节缺失)
-\]
+$$
 
 Report improvement with:
 
-\[
-降幅=\frac{修改前AI率-修改后AI率}{修改前AI率}\times100\%
-\]
+$$
+\text{reduction}=\frac{\text{before}-\text{after}}{\text{before}}\times100\%
+$$
 
 Do not claim that the score is a universal or institutionally valid AI detector. Describe it as an automatic project metric, with Sapling as an optional third-party detector.
 
